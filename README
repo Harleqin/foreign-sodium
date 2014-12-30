@@ -1,0 +1,14 @@
+This is just plumbing to use libsodium from Common Lisp.
+
+You need to install libsodium yourself.
+
+Current status: it works on my computer.  It should find libsodium.so if you
+have a unix-like system and it is in /lib/, /usr/lib/, or /usr/local/lib/.
+However, crypto_box.h needs to be grovelled for constants, and that location is
+currently hardcoded.  I have so far covered only authenticated encryption
+("crypto_box"), more is to come.
+
+History: I had translated TweetNaCl to Common Lisp at 30c3 (see
+https://github.com/Harleqin/naclcl.git), but it was tedious trying to bring it
+to work.  So, on 31c3, a new plan: first get it to work with CFFI, then I can
+start to develop native (Lisp) drop-in replacements for parts of it.

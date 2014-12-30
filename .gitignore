@@ -1,0 +1,5 @@
+*~
+*.fasl
+grovel-libsodium-h
+grovel-libsodium-h.c
+grovel-libsodium-h.grovel-tmp.lisp
