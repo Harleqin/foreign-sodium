@@ -29,19 +29,20 @@
                                 (lambda () (random 256))))
              (nonce (make-nonce))
              (cipher (foreign-sodium:box-message message
-                                               nonce
-                                               receiver-public
-                                               sender-secret))
+                                                 nonce
+                                                 receiver-public
+                                                 sender-secret))
              (uncipher (foreign-sodium:unbox-message cipher
-                                                   nonce
-                                                   sender-public
-                                                   receiver-secret)))
+                                                     nonce
+                                                     sender-public
+                                                     receiver-secret)))
         (is (equalp uncipher message))))))
 
 ;;; The following are tests and example data from the original NaCl
 ;;; distribution.
 
-(deftest (sodium-box2 :in test-box) ()
+;; test/box2.c
+(deftest (test-box-encrypt-decrypt :in test-box) ()
   (let ((bob-secret (u8vector #(#x5d #xab #x08 #x7e #x62 #x4a #x8a #x4b
                                 #x79 #xe1 #x7f #x8b #x83 #x80 #x0e #xe6
                                 #x6f #x3b #xb1 #x29 #x26 #x18 #xb6 #xfd
@@ -91,12 +92,13 @@
                                       #xe0 #x82 #xf9 #x37 #x76 #x38 #x48 #x64
                                       #x5e #x07 #x05))))
     (is (equalp (foreign-sodium:unbox-message cipher
-                                            nonce
-                                            alice-public
-                                            bob-secret)
+                                              nonce
+                                              alice-public
+                                              bob-secret)
                 expected-message))))
 
-(deftest (sodium-box3 :in test-box) ()
+;; test/box3.cpp, test/box.c
+(deftest (test-box-encrypt :in test-box) ()
   (let ((alice-secret (u8vector #(#x77 #x07 #x6d #x0a #x73 #x18 #xa5 #x7d
                                   #x3c #x16 #xc1 #x72 #x51 #xb2 #x66 #x45
                                   #xdf #x4c #x2f #x87 #xeb #xc0 #x99 #x2a
@@ -144,12 +146,17 @@
                                      #x79 #x73 #xf6 #x22 #xa4 #x3d #x14 #xa6
                                      #x59 #x9b #x1f #x65 #x4c #xb4 #x5a #x74
                                      #xe3 #x55 #xa5))))
-    (is (equalp (foreign-sodium:box-message message nonce bob-public alice-secret)
+    (is (equalp (foreign-sodium:box-message message
+                                            nonce
+                                            bob-public
+                                            alice-secret)
                 expected-cipher))))
 
-#+todo
-(deftest (sodium-box6 :in test-box) ()
-  (dotimes (message-length 1000)
+;; test/box6.cpp
+(deftest (test-box-verification :in test-box) ()
+  ;; Only some corner cases, so that the tests are still fast.
+  (dolist (message-length '(0 1 2 7 8 9 15 16 17 31 32 33 63 64 65 127 128 129
+                            255 256 257 511 512 513 767 768 769 1000))
     (multiple-value-bind (sender-public sender-secret)
         (foreign-sodium:make-box-keypair)
       (multiple-value-bind (receiver-public receiver-secret)
@@ -157,9 +164,28 @@
         (let* ((nonce (make-nonce))
                (message (random-vector message-length))
                (cipher (foreign-sodium:box-message message
-                                                 nonce
-                                                 receiver-public
-                                                 sender-secret)))
+                                                   nonce
+                                                   receiver-public
+                                                   sender-secret)))
           (loop
-            :with caught = 0
-            :do ()))))))
+            :with caught := 0
+            :with unchanged := 0
+            :while (< caught 10)
+            :do (setf (aref cipher (random (length cipher)))
+                      (random 256))
+                (handler-case
+                    (let ((changed-message
+                           (foreign-sodium:unbox-message cipher
+                                                         nonce
+                                                         sender-public
+                                                         receiver-secret)))
+                      (is (equalp message changed-message)
+                          "Forged message ~s from original ~s by changing the ~
+                           cipher!"
+                          changed-message
+                          message)
+                      (incf unchanged))
+                  (foreign-sodium:box-verification-error ()
+                    (incf caught))
+                  (condition (c)
+                    (is nil "Unexpected condition ~s!" c)))))))))

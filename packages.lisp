@@ -14,6 +14,7 @@
         #:libsodium-h)
   (:export #:+box-nonce-bytes+
            #:box-message
+           #:box-verification-error
            #:make-box-keypair
            #:unbox-message))
 
