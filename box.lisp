@@ -22,18 +22,22 @@
   (sk (:pointer :unsigned-char)))
 
 (defun make-box-keypair ()
-  "Creates a pair of public and secret key and returns them as two values."
+  "Randomly generates a pair of corresponding public and secret key and returns
+them as two values, first public, then secret.  Guarantees that the secret key
+has +box-secret-key-bytes+ bytes and the public key has +box-public-key-bytes+
+bytes.  Both these constants are grovelled from sodium/crypto_box.h.  Randomness
+is tapped from /dev/urandom through the libsodium randombytes() function."
   (with-foreign-objects ((public-key :unsigned-char +box-public-key-bytes+)
                          (secret-key :unsigned-char +box-secret-key-bytes+))
     (crypto-box-keypair public-key secret-key)
     (values (vector-from-c public-key
-                         +box-public-key-bytes+
-                         :unsigned-char
-                         '(unsigned-byte 8))
+                           +box-public-key-bytes+
+                           :unsigned-char
+                           '(unsigned-byte 8))
             (vector-from-c secret-key
-                         +box-secret-key-bytes+
-                         :unsigned-char
-                         '(unsigned-byte 8)))))
+                           +box-secret-key-bytes+
+                           :unsigned-char
+                           '(unsigned-byte 8)))))
 
 
 ;;; Encryption by Sender
@@ -51,8 +55,13 @@
                       (length (+ (length message) +box-zerobytes+))
                       (padding (make-array +box-zerobytes+
                                            :element-type '(unsigned-byte 8))))
-  "Encrypts a message with a nonce, the receiver's public key, and the sender's
-secret key."
+  "Encrypts and authenticates message using the receiver's public key, and the
+sender's secret key and a nonce and returns the resulting ciphertext.  Signals a
+type-error if sender-secret-key is not a \(vector \(unsigned-byte 8)
++box-secret-key-bytes+) or if receiver-public-key is not a \(vector
+\(unsigned-byte 8) +box-public-key-bytes+) or if nonce is not a \(vector
+\(unsigned-byte 8) +box-nonce-bytes+) or if message is not a \(vector
+\(unsigned-byte 8))."
   (check-type message (vector (unsigned-byte 8)))
   (assert-type nonce `(vector (unsigned-byte 8) ,+box-nonce-bytes+))
   (assert-type receiver-public-key 
@@ -97,7 +106,8 @@ secret key."
   ()
   (:report (lambda (condition stream)
              (declare (ignore condition))
-             (format stream "Cipher could not be verified."))))
+             (format stream "Cipher could not be verified.")))
+  (:documentation "This error signals a failed cipher verification."))
 
 (defcfun (crypto-box-open "crypto_box_open") :int
   (message (:pointer :unsigned-char))
@@ -112,6 +122,13 @@ secret key."
                         (length (+ (length cipher) +box-boxzerobytes+))
                         (padding (make-array +box-boxzerobytes+
                                              :element-type '(unsigned-byte 8))))
+  "Verifies and decrypts cipher using the nonce, the sender's public key, and
+the receiver's secret key.  Returns the plaintext message.  Signals a
+box-verification-error if the ciphertext fails verification.  Signals a
+type-error if cipher is not a \(vector \(unsigned-byte 8)) or if nonce is not a
+\(vector \(unsigned-byte 8) +box-nonce-bytes+) or if sender-public-key is not a
+\(vector \(unsigned-byte 8) +box-public-key-bytes+) or if receiver-secret-key is
+not a \(vector \(unsigned-byte 8) +box-secret-key-bytes+)."
   (check-type cipher (vector (unsigned-byte 8)))
   (assert-type nonce `(vector (unsigned-byte 8) ,+box-nonce-bytes+))
   (assert-type sender-public-key

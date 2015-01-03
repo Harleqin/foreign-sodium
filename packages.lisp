@@ -13,6 +13,8 @@
         #:cffi
         #:libsodium-h)
   (:export #:+box-nonce-bytes+
+           #:+box-public-key-bytes+
+           #:+box-secret-key-bytes+
            #:box-message
            #:box-verification-error
            #:make-box-keypair
