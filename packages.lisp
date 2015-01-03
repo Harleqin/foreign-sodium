@@ -1,7 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:libsodium-h
-  (:use #:cffi-grovel)
+  (:use #:cl #:cffi-grovel)
   (:export #:+box-public-key-bytes+
            #:+box-secret-key-bytes+
            #:+box-nonce-bytes+

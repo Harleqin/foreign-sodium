@@ -1,12 +1,19 @@
 This is just plumbing to use libsodium from Common Lisp.
 
-You need to install libsodium yourself.
+You need to install libsodium yourself, e. g. through your system's package
+manager.
 
 Current status: it works on my computer.  It should find libsodium.so if you
-have a unix-like system and it is in /lib/, /usr/lib/, or /usr/local/lib/.
-However, crypto_box.h needs to be grovelled for constants, and that location is
-currently hardcoded.  I have so far covered only authenticated encryption
-("crypto_box"), more is to come.
+have a unix-like system and it is in /lib/, /usr/lib/, or /usr/local/lib/.  The
+grovelling should also find sodium/crypto_*.h if those are installed where the C
+compiler finds them (most likely /usr/include/).  You might have to install
+another package (e. g. libsodium-dev on Debian derivatives like Ubuntu) to
+actually get the header files.
+
+I have so far covered only authenticated encryption ("crypto_box") including
+tests, more is to come.  Note that the tests are only unit tests, thus test
+functionality, not that there are no side channel attacks (in particular
+timing).
 
 History: I had translated TweetNaCl to Common Lisp at 30c3 (see
 https://github.com/Harleqin/naclcl.git), but it was tedious trying to bring it

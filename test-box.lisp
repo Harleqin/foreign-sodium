@@ -19,6 +19,7 @@
 ;;; A roundtrip of key generation, encrypting, and decrypting.  This only tests
 ;;; that the encryption and decryption operations mirror each other, and that
 ;;; the generated keys can be used for them.
+;;; Also covers the same area as test/box7.c in NaCl.
 (deftest (roundtrip :in test-box) ()
   (multiple-value-bind (sender-public sender-secret)
       (foreign-sodium:make-box-keypair)
@@ -152,7 +153,7 @@
                                             alice-secret)
                 expected-cipher))))
 
-;; test/box6.cpp
+;; test/box6.cpp, test/box8.c
 (deftest (test-box-verification :in test-box) ()
   ;; Only some corner cases, so that the tests are still fast.
   (dolist (message-length '(0 1 2 7 8 9 15 16 17 31 32 33 63 64 65 127 128 129
