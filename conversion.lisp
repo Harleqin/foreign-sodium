@@ -1,6 +1,9 @@
 (in-package #:foreign-sodium)
 
-(defun vector-from-c (pointer size c-element-type lisp-element-type)
+(defun vector-from-c (pointer size
+                      &optional
+                        (c-element-type :unsigned-char)
+                        (lisp-element-type '(unsigned-byte 8)))
   (let ((vector (make-array size :element-type lisp-element-type)))
     (loop
       :for i :below size
@@ -8,7 +11,8 @@
                 (mem-aref pointer c-element-type i)))
     vector))
 
-(defun vector-to-c (vector pointer size c-element-type)
+(defun vector-to-c (vector pointer size
+                    &optional (c-element-type :unsigned-char))
   (loop
     :for element :across vector
     :for i :below size

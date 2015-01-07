@@ -8,7 +8,10 @@
            #:+box-zerobytes+
            #:+box-boxzerobytes+
            #:+scalarmult-bytes+
-           #:+scalarmult-scalarbytes+))
+           #:+scalarmult-scalarbytes+
+           #:+sign-bytes+
+           #:+sign-public-key-bytes+
+           #:+sign-secret-key-bytes+))
 
 (defpackage #:foreign-sodium
   (:use #:cl
@@ -19,11 +22,18 @@
            #:+box-secret-key-bytes+
            #:+scalarmult-bytes+
            #:+scalarmult-scalarbytes+
+           #:+sign-bytes
+           #:+sign-public-key-bytes+
+           #:+sign-secret-key-bytes+
            #:box-message
            #:box-verification-error
            #:make-box-keypair
+           #:make-sign-keypair
+           #:open-signed-message
            #:scalarmult
            #:scalarmult-base
+           #:sign-message
+           #:signature-verification-error
            #:unbox-message))
 
 (defpackage #:foreign-sodium-test

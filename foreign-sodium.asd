@@ -5,27 +5,32 @@
 
 (defpackage #:foreign-sodium/asdf
   (:use #:cl
-        #:asdf))
+        #:asdf
+        #:cffi-grovel))
 
 (in-package #:foreign-sodium/asdf)
 
 (defsystem #:foreign-sodium
-  :defsystem-depends-on (#:cffi-grovel)
   :version "0.2.0"
   :author "Svante v. Erichsen <svante.v.erichsen@web.de>"
   :description "CFFI bindings for libsodium (http://doc.libsodium.org/), which
-is a shared library fork of NaCl (https://nacl.cr.yp.to/)."
+is a shared library fork of NaCl (https://nacl.cr.yp.to/).  Uses only the
+original NaCl C API."
   :license "public domain"
   :serial t
+  :defsystem-depends-on (#:cffi-grovel)
   :depends-on (#:cffi
                #:hu.dwim.stefil)
   :components ((:file "packages")
-               (cffi-grovel:grovel-file "grovel-libsodium-h")
+               (grovel-file "grovel-libsodium-h")
                (:file "conversion")
                (:file "load")
                (:file "init")
                (:file "test")
+               (:file "keypair")
                (:file "box")
                (:file "test-box")
                (:file "scalarmult")
-               (:file "test-scalarmult")))
+               (:file "test-scalarmult")
+               (:file "sign")
+               (:file "test-sign")))

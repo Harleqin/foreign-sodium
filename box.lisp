@@ -12,17 +12,9 @@ them as two values, first public, then secret.  Guarantees that the secret key
 has +box-secret-key-bytes+ bytes and the public key has +box-public-key-bytes+
 bytes.  Both these constants are grovelled from sodium/crypto_box.h.  Randomness
 is tapped from /dev/urandom through the libsodium randombytes() function."
-  (with-foreign-objects ((public-key :unsigned-char +box-public-key-bytes+)
-                         (secret-key :unsigned-char +box-secret-key-bytes+))
-    (crypto-box-keypair public-key secret-key)
-    (values (vector-from-c public-key
-                           +box-public-key-bytes+
-                           :unsigned-char
-                           '(unsigned-byte 8))
-            (vector-from-c secret-key
-                           +box-secret-key-bytes+
-                           :unsigned-char
-                           '(unsigned-byte 8)))))
+  (make-keypair #'crypto-box-keypair
+                +box-public-key-bytes+
+                +box-secret-key-bytes+))
 
 
 ;;; Encryption by Sender
@@ -60,20 +52,17 @@ type-error if sender-secret-key is not a \(vector \(unsigned-byte 8)
                                                 +box-public-key-bytes+)
                          (c-sender-secret-key :unsigned-char
                                               +box-secret-key-bytes+))
-    (vector-to-c padding c-message +box-zerobytes+ :unsigned-char)
+    (vector-to-c padding c-message +box-zerobytes+)
     (vector-to-c message
                  (inc-pointer c-message +box-zerobytes+)
-                 (length message)
-                 :unsigned-char)
+                 (length message))
     (vector-to-c nonce c-nonce +box-nonce-bytes+ :unsigned-char)
     (vector-to-c receiver-public-key
                  c-receiver-public-key
-                 +box-public-key-bytes+
-                 :unsigned-char)
+                 +box-public-key-bytes+)
     (vector-to-c sender-secret-key
                  c-sender-secret-key
-                 +box-secret-key-bytes+
-                 :unsigned-char)
+                 +box-secret-key-bytes+)
     (crypto-box c-cipher
                 c-message
                 length
@@ -81,9 +70,7 @@ type-error if sender-secret-key is not a \(vector \(unsigned-byte 8)
                 c-receiver-public-key
                 c-sender-secret-key)
     (vector-from-c (inc-pointer c-cipher +box-boxzerobytes+)
-                   (- length +box-boxzerobytes+)
-                   :unsigned-char
-                   '(unsigned-byte 8))))
+                   (- length +box-boxzerobytes+))))
 
 ;;; Decryption by Receiver
 
@@ -127,30 +114,24 @@ not a \(vector \(unsigned-byte 8) +box-secret-key-bytes+)."
                                               +box-public-key-bytes+)
                          (c-receiver-secret-key :unsigned-char
                                                 +box-secret-key-bytes+))
-    (vector-to-c padding c-cipher +box-boxzerobytes+ :unsigned-char)
+    (vector-to-c padding c-cipher +box-boxzerobytes+)
     (vector-to-c cipher
                  (inc-pointer c-cipher +box-boxzerobytes+)
-                 (length cipher)
-                 :unsigned-char)
-    (vector-to-c nonce c-nonce +box-nonce-bytes+ :unsigned-char)
+                 (length cipher))
+    (vector-to-c nonce c-nonce +box-nonce-bytes+)
     (vector-to-c sender-public-key
                  c-sender-public-key
-                 +box-public-key-bytes+
-                 :unsigned-char)
+                 +box-public-key-bytes+)
     (vector-to-c receiver-secret-key
                  c-receiver-secret-key
-                 +box-secret-key-bytes+
-                 :unsigned-char)
-    (let* ((int (crypto-box-open c-message
-                                 c-cipher
-                                 length
-                                 c-nonce
-                                 c-sender-public-key
-                                 c-receiver-secret-key))
-           (verifiedp (zerop int)))
-      (when (not verifiedp)
-        (error 'box-verification-error))
-      (vector-from-c (inc-pointer c-message +box-zerobytes+)
-                     (- length +box-zerobytes+)
-                     :unsigned-char
-                     '(unsigned-byte 8)))))
+                 +box-secret-key-bytes+)
+    (let ((verifiedp (zerop (crypto-box-open c-message
+                                             c-cipher
+                                             length
+                                             c-nonce
+                                             c-sender-public-key
+                                             c-receiver-secret-key))))
+      (if verifiedp
+          (vector-from-c (inc-pointer c-message +box-zerobytes+)
+                         (- length +box-zerobytes+))
+          (error 'box-verification-error)))))

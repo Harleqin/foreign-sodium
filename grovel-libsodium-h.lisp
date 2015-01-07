@@ -2,6 +2,7 @@
 
 (include "sodium/crypto_box.h")
 (include "sodium/crypto_scalarmult.h")
+(include "sodium/crypto_sign.h")
 
 ;;; crypto_box.h
 
@@ -30,3 +31,17 @@ For Curve25519: 32.")
 (constant (+scalarmult-scalarbytes+ "crypto_scalarmult_SCALARBYTES")
           :documentation "The exact length of a multiplier byte vector for
 scalar multiplication.  For Curve25519: 32.")
+
+;;; crypto_sign.h
+
+(constant (+sign-public-key-bytes+ "crypto_sign_PUBLICKEYBYTES")
+          :documentation "The exact length of a public key byte vector for
+signing.  For Ed25519: 32.")
+
+(constant (+sign-secret-key-bytes+ "crypto_sign_SECRETKEYBYTES")
+          :documentation "The exact length of a secret key byte vector for
+signing.  For Ed25519: 64.")
+
+(constant (+sign-bytes+ "crypto_sign_BYTES")
+          :documentation "The maximum length that a signed message takes more
+than the unsigned message.")

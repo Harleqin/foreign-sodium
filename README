@@ -130,3 +130,45 @@ scalarmult-base n => result
 
   The exact length of a multiplier byte vector for scalar multiplication.  For
   Curve25519: 32.
+
+
+** Signatures
+
+Signatures are provided through the Ed25519 curve.
+
+[function]
+make-sign-keypair => public-key, secret-key
+
+  Randomly generates a pair of corresponding public and secret key and returns
+  them as two values, first public, then secret.  Guarantees that the secret key
+  has +sign-secret-key-bytes+ and the public key +sign-public-key-bytes+.
+
+[function]
+sign-message message secret-key => signed-message
+
+  Signs message with secret-key.  Returns the signed message.  Signals a
+  type-error if message is not a (vector (unsigned-byte 8)) or if secret-key is
+  not a (vector (unsigned-byte 8) +sign-secret-key-bytes+).
+
+[function]
+open-signed-message signed-message public-key => message
+
+  Verifies the signature in signed-message using public-key, then returns the
+  plain message.  Signals a signature-verification-error if verification fails.
+  Signals a type-error if signed-message is not a (vector (unsigned-byte 8)) or
+  if public-key is not a (vector (unsigned-byte 8) +sign-public-key-bytes+).
+
+[condition type]
+signature-verification-error (error)
+
+  This error signals a failed signature verification.
+
+[constant]
++sign-public-key-bytes+
+
+  The exact length of a public key byte vector for signing.  For Ed25519: 32.
+
+[constant]
++sign-secret-key-bytes+
+
+  The exact length of a secret key byte vector for signing.  For Ed25519: 64.

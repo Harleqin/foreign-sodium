@@ -14,7 +14,7 @@
 (defun make-nonce ()
   (random-vector foreign-sodium:+box-nonce-bytes+))
 
-(defsuite* test-box)
+(defsuite* (test-box :in test-foreign-sodium))
 
 ;;; A roundtrip of key generation, encrypting, and decrypting.  This only tests
 ;;; that the encryption and decryption operations mirror each other, and that
