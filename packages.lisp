@@ -6,7 +6,9 @@
            #:+box-secret-key-bytes+
            #:+box-nonce-bytes+
            #:+box-zerobytes+
-           #:+box-boxzerobytes+))
+           #:+box-boxzerobytes+
+           #:+scalarmult-bytes+
+           #:+scalarmult-scalarbytes+))
 
 (defpackage #:foreign-sodium
   (:use #:cl
@@ -18,6 +20,8 @@
            #:box-message
            #:box-verification-error
            #:make-box-keypair
+           #:scalarmult
+           #:scalarmult-base
            #:unbox-message))
 
 (defpackage #:foreign-sodium-test

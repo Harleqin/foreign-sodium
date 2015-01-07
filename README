@@ -72,7 +72,7 @@ keys, Salsa20 stream cipher, and Poly1305 one-time authentication.
 
 [constant] +box-nonce-bytes+
 
-  The exact length of a nonce byte vector.  For Salsa20: 24.
+  The exact length of a nonce byte vector.  For XSalsa20: 24.
 
 [constant] +box-public-key-bytes+
 

@@ -5,12 +5,12 @@
 
 (defpackage #:foreign-sodium/asdf
   (:use #:cl
-        #:asdf
-        #:cffi-grovel))
+        #:asdf))
 
 (in-package #:foreign-sodium/asdf)
 
 (defsystem #:foreign-sodium
+  :defsystem-depends-on (#:cffi-grovel)
   :version "0.1.0"
   :author "Svante v. Erichsen <svante.v.erichsen@web.de>"
   :description "CFFI bindings for libsodium (http://doc.libsodium.org/), which
@@ -20,7 +20,12 @@ is a shared library fork of NaCl (https://nacl.cr.yp.to/)."
   :depends-on (#:cffi
                #:hu.dwim.stefil)
   :components ((:file "packages")
-               (grovel-file "grovel-libsodium-h")
+               (cffi-grovel:grovel-file "grovel-libsodium-h")
                (:file "conversion")
+               (:file "load")
+               (:file "init")
+               (:file "test")
                (:file "box")
-               (:file "test-box")))
+               (:file "test-box")
+               (:file "scalarmult")
+               (:file "test-scalarmult")))

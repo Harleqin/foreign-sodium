@@ -1,20 +1,5 @@
 (in-package #:foreign-sodium)
 
-(define-foreign-library libsodium
-  (t "libsodium.so"))
-
-(defun load-libsodium ()
-  (let ((cffi:*foreign-library-directories* (list #p"/lib/"
-                                                  #p"/usr/lib/"
-                                                  #p"/usr/local/lib/")))
-    (use-foreign-library libsodium)))
-
-(load-libsodium)
-
-;;; Necessary for thread safety, according to crypto_box.h
-(defcfun (sodium-init "sodium_init") :void)
-(sodium-init)
-
 ;;; Key pair generation
 
 (defcfun (crypto-box-keypair "crypto_box_keypair") :int
