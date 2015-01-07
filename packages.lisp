@@ -17,6 +17,8 @@
   (:export #:+box-nonce-bytes+
            #:+box-public-key-bytes+
            #:+box-secret-key-bytes+
+           #:+scalarmult-bytes+
+           #:+scalarmult-scalarbytes+
            #:box-message
            #:box-verification-error
            #:make-box-keypair

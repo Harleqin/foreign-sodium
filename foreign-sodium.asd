@@ -11,7 +11,7 @@
 
 (defsystem #:foreign-sodium
   :defsystem-depends-on (#:cffi-grovel)
-  :version "0.1.0"
+  :version "0.2.0"
   :author "Svante v. Erichsen <svante.v.erichsen@web.de>"
   :description "CFFI bindings for libsodium (http://doc.libsodium.org/), which
 is a shared library fork of NaCl (https://nacl.cr.yp.to/)."
