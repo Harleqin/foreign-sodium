@@ -11,7 +11,7 @@
 (in-package #:foreign-sodium/asdf)
 
 (defsystem #:foreign-sodium
-  :version "0.2.0"
+  :version "0.3.1"
   :author "Svante v. Erichsen <svante.v.erichsen@web.de>"
   :description "CFFI bindings for libsodium (http://doc.libsodium.org/), which
 is a shared library fork of NaCl (https://nacl.cr.yp.to/).  Uses only the
