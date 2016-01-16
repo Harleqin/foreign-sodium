@@ -35,7 +35,3 @@
            #:sign-message
            #:signature-verification-error
            #:unbox-message))
-
-(defpackage #:foreign-sodium-test
-  (:use #:cl
-        #:hu.dwim.stefil))
